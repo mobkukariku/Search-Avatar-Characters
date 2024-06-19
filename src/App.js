@@ -1,25 +1,53 @@
-import logo from './logo.svg';
 import './App.css';
+import CardList from './components/card-list/card-list.component';
+import { Component } from 'react';
+import SearchBox from './components/search/search-list.component';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component{
+  constructor(){
+    super();
+    this.state ={
+      characters: [],
+      searchField: ''
+    };
+  };
+
+  componentDidMount(){
+    fetch('https://api.sampleapis.com/avatar/characters')
+    .then((response)=>response.json())
+    .then((characters)=> this.setState(()=>{
+      return {characters}
+    }, ()=>{
+        console.log(this.state)
+      }
+    ))
+  }
+
+  onSearchChange = (e)=>{
+    const searchField = e.target.value.toLowerCase();
+    this.setState({searchField})
+  }
+
+  render(){
+    const {characters, searchField} = this.state;
+    const {onSearchChange} = this;
+    console.log(characters.image)
+
+    const FilteredChar = characters.filter((char)=>{
+      if (char.name === undefined) {
+        return ''
+      }else{
+        return char.name.toLowerCase().includes(searchField);
+      }
+    });
+
+    return (
+     <div className='App'>
+      <SearchBox className={"characters-search-box"} onSearchHandle={onSearchChange}/>
+      <CardList characters={FilteredChar} />
+     </div> 
+    );
+  }
 }
 
 export default App;
